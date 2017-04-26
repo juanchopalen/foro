@@ -38,7 +38,7 @@ class MarkCommentAsAnswerTest extends TestCase
 
 		$this->assertFalse($comments->first()->fresh()->answer);
 
-		$this->assertTrus($comments->last()->fresh()->answer);
+		$this->assertTrue($comments->last()->fresh()->answer);
 
 	}	
 }
