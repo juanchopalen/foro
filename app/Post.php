@@ -6,6 +6,7 @@ use App\User;
 use App\Comment;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use GrahamCampbell\Markdown\Facades\Markdown;
 
 class Post extends Model
 {
@@ -41,4 +42,10 @@ class Post extends Model
     {
         return route('posts.show', [$this->id, $this->slug]);
     }
+
+    public function getSafeHtmlContentAttribute()
+    {
+        return Markdown::convertToHtml(e($this->content));
+    }
+
 }
