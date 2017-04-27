@@ -22,7 +22,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'username', 'email', 'first_name', 'last_name',
     ];
 
     /**
@@ -97,4 +97,9 @@ class User extends Authenticatable
     {
         return $this->id === $model->user_id;
     }
+
+    public function getNameAttribute()
+    {
+        return $this->firstName . ' ' . $this->lastName;
+    }        
 }
