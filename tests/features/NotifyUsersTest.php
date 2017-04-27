@@ -22,8 +22,6 @@ class NotifyUsersTest extends FeatureTestCase
 
     	$comment = $writer->comment($post, 'Un comentario cualquiera');
 
-    	$this->assertTrue(true);
-
     	Notification::assertSentTo(
     		$subscriber, PostCommented::class, function ($notification) use($comment){
     			return $notification->comment->id == $comment->id;
