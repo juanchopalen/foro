@@ -1,8 +1,7 @@
 <?php 
 
-/**
-* 
-*/
+use App\Post;
+
 class CreatePostsTest extends FeatureTestCase
 {
 	
@@ -26,10 +25,19 @@ class CreatePostsTest extends FeatureTestCase
 				'content' => $content,
 				'pending' => true,
 				'user_id' => $user->id,
+				'slug' => 'esta-es-una-pregunta',
 			]);
 
+			$post = Post::first();
+
+			$this->seeInDatabase('subscriptions',[
+				'user_id' => $user->id,
+				'post_id' => $post->id,
+			]);			
+
+
 		// Test a user is redirected to de posts detail after create a post
-			$this->see($title);
+			$this->seePageIs($post->url);
 	}
 
 	public function test_creating_a_post_requires_authentication()

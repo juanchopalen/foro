@@ -41,20 +41,36 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }    
 
+    public function subscriptions()
+    {
+        return $this->belongsToMany(Post::class, 'subscriptions');
+    }      
+
+    public function createPost(array $data)
+    {
+        $post = new Post($data);
+
+        $this->posts()->save($post);
+
+        $this->subscribeTo($post);
+
+        return $post;
+    }
+
     public function isSubscribedTo(Post $post)
     {
         return $this->subscriptions()->where('post_id', $post->id)->count() > 0;
     }
 
-        public function subscribeTo(Post $post)
+    public function subscribeTo(Post $post)
     {
-        return $this->subscriptions()->attach($post);
+        $this->subscriptions()->attach($post);
     }
-
-    public function subscriptions()
+ 
+    public function unsubscribeFrom(Post $post)
     {
-        return $this->belongsToMany(Post::class, 'subscriptions');
-    }    
+        $this->subscriptions()->detach($post);
+    }
 
     public function comment(Post $post, $message)
     {
@@ -70,7 +86,4 @@ class User extends Authenticatable
     {
         return $this->id === $model->user_id;
     }
-
-
-
 }

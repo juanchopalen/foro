@@ -26,3 +26,8 @@ Route::post('posts/{post}/subscribe', [
 	'uses' => 'SubscriptionController@subscribe',
 	'as' => 'posts.subscribe'
 ]);
+
+Route::delete('posts/{post}/unsubscribe', [
+	'uses' => 'SubscriptionController@unsubscribe',
+	'as' => 'posts.unsubscribe'
+]);
