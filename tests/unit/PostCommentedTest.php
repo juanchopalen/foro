@@ -1,15 +1,12 @@
 <?php
 
 use App\Notifications\PostCommented;
-use App\User;
-use App\Post;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\{User,Post, Comment};
 use Illuminate\Notifications\Messages\MailMessage;
 
 class PostCommentedTest extends TestCase
 {
 
-	use DatabaseTransactions;
 
 	/**
 	*@test
@@ -17,22 +14,22 @@ class PostCommentedTest extends TestCase
 
 	function it_builds_a_mail_message()
 	    {
-	    	$post = factory(Post::class)->create([
+	    	$post = new Post([
 	    		'title' => 'Titulo del post',
 	    	]);
 
-	    	$author = factory(User::class)->create([
+	    	$author = new User([
 	    		'name' => 'Juan Palencia'
 	    	]);
 
-	        $comment = factory(\App\Comment::class)->create([
-	        	'post_id' => $post->id,
-	        	'user_id' => $author->id,
-	        ]);
+	        $comment = new Comment();
+	        $comment->post = $post;
+	        $comment->user = $author;
+
 
 	        $notification = new PostCommented($comment);
 
-	        $subscriber = factory(User::class)->create();
+	        $subscriber = new User();
 
 	        $message = $notification->toMail($subscriber);
 
