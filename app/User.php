@@ -100,6 +100,6 @@ class User extends Authenticatable
 
     public function getNameAttribute()
     {
-        return $this->firstName . ' ' . $this->lastName;
+        return "{$this->first_name} {$this->last_name}";
     }        
 }

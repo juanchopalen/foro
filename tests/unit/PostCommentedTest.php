@@ -19,7 +19,8 @@ class PostCommentedTest extends TestCase
 	    	]);
 
 	    	$author = new User([
-	    		'name' => 'Juan Palencia'
+	    		'first_name' => 'Juan',
+	    		'last_name' => 'Palencia'
 	    	]);
 
 	        $comment = new Comment();

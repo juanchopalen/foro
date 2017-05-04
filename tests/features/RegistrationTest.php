@@ -38,20 +38,7 @@ class RegistrationTest extends FeatureTestCase
 			return $mail->token->id == $token->id;
 		});
 
-		$this->seeRouteIs('register_confirmation')
-			->see('Gracias por registrarte')
-			->see('Enviamos a tu email un enlace para que inicies sesion ');
+		$this->see('Enviamos a tu email un enlace para que inicies sesion');
 	}
-
-	public function test_validate_user_registration()
-	{
-		$this->visitRoute('register')
-			->press('Registrate')
-			->seeErrors([
-				'email' => 'el campo email es obligatorio',
-				'username' => 'el campo username es obligatorio',
-				'first_name' => 'el campo first_name es obligatorio',
-				'last_name' => 'el campo last_name es obligatorio',
-			]);   
-	}    	
+	
 }
