@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use App\Token;
-
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -13,10 +12,19 @@ class TokenMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-   public $token;
+    /**
+     * @var Token
+     */
+    public $token;
 
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
     public function __construct(Token $token)
     {
+        //
         $this->token = $token;
     }
 

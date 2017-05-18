@@ -5,40 +5,37 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class MarkCommentAsAnswerTest extends TestCase
 {
+    use DatabaseTransactions;
 
-	use DatabaseTransactions;
+    function test_a_post_can_be_answered()
+    {
+        $post = $this->createPost();
 
-	function test_a_post_can_be_answered()
-	{
-		$post = $this->createPost();
+        $comment = factory(Comment::class)->create([
+            'post_id' => $post->id
+        ]);
 
-		$comment = factory(Comment::class)->create([
-			'post_id' => $post->id
-		]);
+        $comment->markAsAnswer();
 
-		$comment->markAsAnswer();
+        $this->assertTrue($comment->fresh()->answer);
 
-		$this->assertTrue($comment->fresh()->answer);
+        $this->assertFalse($post->fresh()->pending);
+    }
 
-		$this->assertFalse($post->fresh()->pending);
+    function test_a_post_can_only_have_one_answer()
+    {
+        $post = $this->createPost();
 
-	}
+        $comments = factory(Comment::class)->times(2)->create([
+            'post_id' => $post->id
+        ]);
 
-	function test_a_post_can_only_have_one_answer()
-	{
-		$post = $this->createPost();
+        $comments->first()->markAsAnswer();
 
-		$comments = factory(Comment::class)->times(2)->create([
-			'post_id' => $post->id
-		]);
+        $comments->last()->markAsAnswer();
 
-		$comments->first()->markAsAnswer();
+        $this->assertFalse($comments->first()->fresh()->answer);
 
-		$comments->last()->markAsAnswer();
-
-		$this->assertFalse($comments->first()->fresh()->answer);
-
-		$this->assertTrue($comments->last()->fresh()->answer);
-
-	}	
+        $this->assertTrue($comments->last()->fresh()->answer);
+    }
 }

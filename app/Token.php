@@ -3,36 +3,53 @@
 namespace App;
 
 use App\Mail\TokenMail;
-
-use Illuminate\Support\Facades\Mail;
-
+use Illuminate\Support\Facades\{Mail, Auth};
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Token extends Model
 {
-	protected $guarded = [];
+    protected $guarded = [];
 
-	public function user()
-	{
-	    return $this->belongsTo(User::class);
-	}    	
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-	public static function generateFor (User $user)
-	{		
-		$token = new static;
-		
-		$token->token = str_random(60);
+    public function getRouteKeyName()
+    {
+        return 'token';
+    }
 
-		$token->user()->associate($user);
+    public static function generateFor(User $user)
+    {
+        $token = new static;
 
-		$token->save();
+        $token->token = str_random(60);
 
-		return $token;
+        $token->user()->associate($user);
 
-	}    
+        $token->save();
 
-	public function sendByEmail()
-	{
-	    Mail::to($this->user)->send(new TokenMail($this));
-	}    
+        return $token;
+    }
+
+    public function sendByEmail()
+    {
+        Mail::to($this->user)->send(new TokenMail($this));
+    }
+
+    public function login()
+    {
+        Auth::login($this->user);
+
+        $this->delete();       
+    }    
+
+    public static function findActive($token)
+    {
+        return static::where('token', $token)
+            ->where('created_at', '>=', Carbon::parse('-30 minutes'))
+            ->first();
+    }
 }

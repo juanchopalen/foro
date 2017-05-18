@@ -2,15 +2,11 @@
 
 namespace App;
 
-use App\Comment;
-use App\Post;
 use App\Notifications\PostCommented;
-
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Notification;
-
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
@@ -22,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'first_name', 'last_name',
+        'email', 'username', 'first_name', 'last_name',
     ];
 
     /**
@@ -42,12 +38,12 @@ class User extends Authenticatable
     public function comments()
     {
         return $this->hasMany(Comment::class);
-    }    
+    }
 
     public function subscriptions()
     {
         return $this->belongsToMany(Post::class, 'subscriptions');
-    }      
+    }
 
     public function createPost(array $data)
     {
@@ -60,21 +56,6 @@ class User extends Authenticatable
         return $post;
     }
 
-    public function isSubscribedTo(Post $post)
-    {
-        return $this->subscriptions()->where('post_id', $post->id)->count() > 0;
-    }
-
-    public function subscribeTo(Post $post)
-    {
-        $this->subscriptions()->attach($post);
-    }
- 
-    public function unsubscribeFrom(Post $post)
-    {
-        $this->subscriptions()->detach($post);
-    }
-
     public function comment(Post $post, $message)
     {
         $comment = new Comment([
@@ -84,13 +65,28 @@ class User extends Authenticatable
 
         $this->comments()->save($comment);
 
-        //Notify subscribers
+        // Notify subscribers
         Notification::send(
-                $post->subscribers()->where('users.id', '!=', $this->id)->get(), 
-                new PostCommented($comment)
+            $post->subscribers()->where('users.id', '!=', $this->id)->get(),
+            new PostCommented($comment)
         );
 
         return $comment;
+    }
+
+    public function isSubscribedTo(Post $post)
+    {
+        return $this->subscriptions()->where('post_id', $post->id)->count() > 0;
+    }
+
+    public function subscribeTo(Post $post)
+    {
+        $this->subscriptions()->attach($post);
+    }
+
+    public function unsubscribeFrom(Post $post)
+    {
+        $this->subscriptions()->detach($post);
     }
 
     public function owns(Model $model)
@@ -101,5 +97,5 @@ class User extends Authenticatable
     public function getNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
-    }        
+    }
 }

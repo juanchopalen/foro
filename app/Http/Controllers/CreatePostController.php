@@ -9,17 +9,17 @@ class CreatePostController extends Controller
 {
     public function create()
     {
-    	return view('posts.create');
+        return view('posts.create');
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
             'title' => 'required',
-            'content' => 'required',
+            'content' => 'required'
         ]);
 
-       $post = auth()->user()->createPost($request->all());
+        $post = auth()->user()->createPost($request->all());
 
         return redirect($post->url);
     }

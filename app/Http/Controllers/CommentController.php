@@ -9,16 +9,19 @@ class CommentController extends Controller
 {
     public function store(Request $request, Post $post)
     {
-    	
-    	auth()->user()->comment($post, $request->get('comment'));
+        //todo: Add validation!
 
-    	return redirect($post->url);
+        auth()->user()->comment($post, $request->get('comment'));
+
+        return redirect($post->url);
     }
 
-    public function  accept(Comment $comment)
+    public function accept(Comment $comment)
     {
-    	$this->authorize('accept', $comment);
-    	$comment->markAsAnswer();
-    	return redirect($comment->post->url);
+        $this->authorize('accept', $comment);
+
+        $comment->markAsAnswer();
+
+        return redirect($comment->post->url);
     }
 }

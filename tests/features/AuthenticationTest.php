@@ -1,80 +1,104 @@
 <?php
 
-use Illuminate\Support\Facades\Mail;
 use App\Token;
+use Carbon\Carbon;
 
 class AuthenticationTest extends FeatureTestCase
 {
+    function test_a_user_can_login_with_a_token_url()
+    {
+        // Having
+        $user = $this->defaultUser();
 
-	    public function test_a_guest_user_can_request_a_token()
-	    {
-		//Having
-		Mail::fake();
+        $token = Token::generateFor($user);
 
-		$user = $this->defaultUser([
-			'email' => 'klaustro@hotmail.com'
-		]);
+        // When
+        $this->visit("login/{$token->token}");
 
-		//When
-		$this->visitRoute('login')
-			->type('klaustro@hotmail.com', 'email')
-			->press('Solicitar Token');
+        // Then
+        $this->seeIsAuthenticated()
+            ->seeIsAuthenticatedAs($user);
 
-		//Then: a token is created in the database
-		$token = Token::where('user_id', $user->id)->first();
+        $this->dontSeeInDatabase('tokens', [
+            'id' => $token->id
+        ]);
 
-		$this->assertNotNull($token, 'A token was not created');
-
-		//And sent to the user
-		Mail::assertSentTo($user, \App\Mail\TokenMail::class, function($mail) use($token){
-			return $mail->token->id === $token->id;
-
-		});
-	   	 $this->dontSeeIsAuthenticated();
-
-
-		$this->see('Enviamos a tu email un enlace para que inicies sesion');
+        $this->seePageIs('/');
     }
 
-	    public function test_a_guest_user_can_request_a_token_without_an_email()
-	    {
+    function test_a_user_cannot_login_with_an_invalid_token()
+    {
+        // Having
+        $user = $this->defaultUser();
 
+        $token = Token::generateFor($user);
 
-		//When
-		$this->visitRoute('login')
-			->press('Solicitar Token');
+        $InvalidToken = str_random(60);
 
-		//Then: a token is created in the database
-		$token = Token::first();
+        // When
+        $this->visit("login/{$InvalidToken}");
 
-		$this->assertNull($token, 'A token was not created');
+        // Then
+        $this->dontSeeIsAuthenticated()
+            ->seeRouteIs('token')
+            ->see('Este enlace ya expiró, por favor solicite otro');
 
-	    	$this->dontSeeIsAuthenticated();
-
-		$this->seeErrors(['email' => 'El campo correo electrónico es obligatorio']);
+        $this->SeeInDatabase('tokens', [
+            'id' => $token->id
+        ]);
     }    
 
-	public function test_a_guest_user_can_request_a_token_with_a_non_exixtent_email()
-	{
+    function test_a_user_cannot_use_the_same_token_twice()
+    {
+        // Having
+        $user = $this->defaultUser();
 
+        $token = Token::generateFor($user);
 
-		$user = $this->defaultUser([
-			'email' => 'juanchopalen@hotmail.com'
-		]);
+        $token->login();
 
-		//When
-		$this->visitRoute('login')
-		->type('klaustro@hotmail.com', 'email')
-		->press('Solicitar Token');
+        Auth::logout();
 
-		//Then: a token is created in the database
-		$token = Token::first();
+        // When
+        $this->visit("login/{$token->token}");
 
-		$this->assertNull($token, 'A token was not created');
+        // Then
+        $this->dontSeeIsAuthenticated()
+            ->seeRouteIs('token')
+            ->see('Este enlace ya expiró, por favor solicite otro');
+    }    
 
-		$this->dontSeeIsAuthenticated();
+    function test_a_the_token_expires_after_30_minutes()
+    {
+        // Having
+        $user = $this->defaultUser();
 
+        $token = Token::generateFor($user);
 
-		$this->seeErrors(['email' => 'Correo electrónico es inválido']);
-	}      
+        Carbon::setTestNow(Carbon::parse('+31 minutes'));
+
+        // When
+        $this->visitRoute('login',[$token->token]);
+
+        // Then
+        $this->dontSeeIsAuthenticated()
+            ->seeRouteIs('token')
+            ->see('Este enlace ya expiró, por favor solicite otro');
+    }    
+
+    function test_the_token_is_case_sensitive()
+    {
+        // Having
+        $user = $this->defaultUser();
+
+        $token = Token::generateFor($user);
+
+        // When
+        $this->visitRoute('login',[strtolower($token->token)]);
+
+        // Then
+        $this->dontSeeIsAuthenticated()
+            ->seeRouteIs('token')
+            ->see('Este enlace ya expiró, por favor solicite otro');
+    }   
 }

@@ -1,46 +1,50 @@
 @extends('layouts/app')
 
 @section('content')
+    <h1>{{ $post->title }}</h1>
 
-	<h1>{{ $post->title }}</h1>
+    {!! $post->safe_html_content !!}
 
-	{!! $post->safe_html_content !!}}
+    <p>{{ $post->user->name }}</p>
 
-	<p>{{ $post->user->name }}</p>
-	@if (auth()->check())
-	    @if (!auth()->user()->isSubscribedTo($post))
-	        {!! Form::open(['route' => ['posts.subscribe', $post], 'method' => 'POST']) !!}
-	            <button type="submit">Suscribirse al post</button>
-	        {!! Form::close() !!}
-	    @else
-	        {!! Form::open(['route' => ['posts.unsubscribe', $post], 'method' => 'DELETE']) !!}
-	            <button type="submit">Desuscribirse del post</button>
-	        {!! Form::close() !!}
-	    @endif
-	@endif
+    @if (auth()->check())
+        @if (!auth()->user()->isSubscribedTo($post))
+            {!! Form::open(['route' => ['posts.subscribe', $post], 'method' => 'POST']) !!}
+                <button type="submit">Suscribirse al post</button>
+            {!! Form::close() !!}
+        @else
+            {!! Form::open(['route' => ['posts.unsubscribe', $post], 'method' => 'DELETE']) !!}
+                <button type="submit">Desuscribirse del post</button>
+            {!! Form::close() !!}
+        @endif
+    @endif
 
-	<h4>Comnetarios</h4>
+    <h4>Comentarios</h4>
 
-	{!! Form::open(['route' =>[ 'comments.store', $post], 'method' => 'POST']) !!}
-	
-		{!! Field::textarea('comment')!!}
+    {!! Form::open(['route' => ['comments.store', $post], 'method' => 'POST']) !!}
 
-		<button type="submit">
-			Publicar comentario
-		</button>
+        {!! Field::textarea('comment') !!}
 
-	{!!  Form::close() !!}
-	@foreach($post->latestComments as $comment)
-		<article class="{{ $comment->answer ? 'answer' : '' }}">		
-			{{ $comment->comment }}
+        <button type="submit">
+            Publicar comentario
+        </button>
 
-			@if(Gate::allows('accept', $comment) && !$comment->answer)
-				{!! Form::open(['route' =>[ 'comments.accept', $comment], 'method' => 'POST']) !!}
-					<button type="submit">Aceptar respuesta</button>
-				{!!  Form::close() !!}			
-			@endif
+    {!! Form::close() !!}
 
-		</article>
-	@endforeach		
+    {{-- todo: Paginate comments! --}}
 
+    @foreach($post->latestComments as $comment)
+        <article class="{{ $comment->answer ? 'answer' : '' }}">
+
+            {{-- todo: support markdown in the comments as well! --}}
+
+            {{ $comment->comment }}
+
+            @if(Gate::allows('accept', $comment) && !$comment->answer)
+            {!! Form::open(['route' => ['comments.accept', $comment], 'method' => 'POST']) !!}
+                <button type="submit">Aceptar respuesta</button>
+            {!! Form::close() !!}
+            @endif
+        </article>
+    @endforeach
 @endsection

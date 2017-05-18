@@ -4,25 +4,25 @@ use Illuminate\Support\Facades\Notification;
 
 class WriteCommentTest extends FeatureTestCase
 {
-    public function test_a_user_can_write_a_comment()
+    function test_a_user_can_write_a_comment()
     {
-    	Notification::fake();
-    	
-	$post = $this->createPost();
+        Notification::fake();
 
-	$user = $this->defaultUser();
+        $post = $this->createPost();
 
-	$this->actingAs($user)
-		->visit($post->url)
-		->type('Un comentario', 'comment')
-		->press('Publicar comentario');
+        $user = $this->defaultUser();
 
-	$this->seeInDatabase('comments',[
-		'comment' => 'Un comentario',
-		'user_id' => $user->id,
-		'post_id' => $post->id
-	]);
+        $this->actingAs($user)
+            ->visit($post->url)
+            ->type('Un comentario', 'comment')
+            ->press('Publicar comentario');
 
-	$this->seePageIs($post->url);
+        $this->seeInDatabase('comments', [
+            'comment' => 'Un comentario',
+            'user_id' => $user->id,
+            'post_id' => $post->id,
+        ]);
+
+        $this->seePageIs($post->url);
     }
 }
