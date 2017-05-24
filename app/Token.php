@@ -52,4 +52,10 @@ class Token extends Model
             ->where('created_at', '>=', Carbon::parse('-30 minutes'))
             ->first();
     }
+
+    public function getUrlAttribute()
+    {
+        return route('login', ['token' => $this->token]);
+    }
+
 }
