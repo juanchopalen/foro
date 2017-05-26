@@ -8,7 +8,7 @@ use GrahamCampbell\Markdown\Facades\Markdown;
 
 class Post extends Model
 {
-    protected $fillable = ['title', 'content'];
+    protected $fillable = ['title', 'content', 'category_id'];
 
     protected $casts = [
         'pending' => 'boolean'
@@ -17,6 +17,11 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+        public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function comments()
@@ -32,6 +37,23 @@ class Post extends Model
     public function latestComments()
     {
         return $this->comments()->orderBy('created_at', 'DESC');
+    }
+
+    public function scopeCategory($query, Category $category)
+    {
+        if ($category->exists) {
+           $query->where('category_id', $category->id);
+        }
+    }
+
+    public function scopePending($query)
+    {
+        $query->where('pending', true);
+    }
+
+    public function scopeCompleted($query)
+    {
+        $query->where('pending', false);
     }
 
     public function setTitleAttribute($value)
