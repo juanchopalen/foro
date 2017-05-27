@@ -12,14 +12,19 @@ class PostController extends Controller
 {
     public function index(Category $category = null, Request $request)
     {
-        $posts = Post::orderBy('created_at', 'DESC')
-            ->scopes($this->getListScopes($category, $request))
-            ->paginate();
+      list($orderColumn, $orderDirection) = $this->getListOrder($request->get('orden'));
+
+      $posts = Post::query()
+          ->scopes($this->getListScopes($category, $request))
+          ->orderBy($orderColumn, $orderDirection)
+          ->paginate();
+
+        $posts->appends(request()->intersect(['orden']));
 
 
-        $categoryItems = $this->getCategoryItems();
+      $categoryItems = $this->getCategoryItems();
 
-        return view('posts.index', compact('posts', 'category', 'categoryItems'));
+      return view('posts.index', compact('posts', 'category', 'categoryItems'));
     }
     
     protected function getCategoryItems()
@@ -61,4 +66,18 @@ class PostController extends Controller
 
        return $scopes;
    }    
+
+  public function getListOrder($order)   
+  {
+      if ($order == 'recientes') {
+        return ['created_at', 'desc'];
+      }
+
+      if ($order == 'antiguos') {
+             return ['created_at', 'asc'];
+      }     
+
+      return ['created_at', 'desc'];      
+
+  }
 }
