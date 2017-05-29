@@ -8,9 +8,9 @@ use App\{Post, Category};
 
 use Illuminate\Http\Request;
 
-class PostController extends Controller
+class ListPostController extends Controller
 {
-    public function index(Category $category = null, Request $request)
+    public function __invoke(Category $category = null, Request $request)
     {
       list($orderColumn, $orderDirection) = $this->getListOrder($request->get('orden'));
 
@@ -35,15 +35,6 @@ class PostController extends Controller
                 'full_url' => route('posts.index', $category)
             ];
         })->toArray();
-    }
-
-    public function show(Post $post, $slug)
-    {
-        if ($post->slug != $slug) {
-            return redirect($post->url, 301);
-        }
-
-        return view('posts.show', compact('post'));
     }
 
    protected function getListScopes(Category $category, Request $request)
