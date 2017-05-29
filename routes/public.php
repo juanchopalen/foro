@@ -20,12 +20,12 @@ Route::get('posts/{post}-{slug}', [
 
 Route::get('posts-pendientes', [
     'uses' => 'ListPostController',
-    'as' => 'posts.pending'
+    'as' => 'posts.pending',
 ]);
 
 Route::get('posts-completados', [
     'uses' => 'ListPostController',
-    'as' => 'posts.completed'
+    'as' => 'posts.completed',
 ]);
 
 Route::get('{category?}', [

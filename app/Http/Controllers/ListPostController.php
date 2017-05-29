@@ -5,46 +5,35 @@ namespace App\Http\Controllers;
 use App\{Post, Category};
 use Illuminate\Http\Request;
 
+
 class ListPostController extends Controller
 {
     public function __invoke(Category $category = null, Request $request)
-    {
-        $routeName = $request->route()->getName();
-
+    {     
         list($orderColumn, $orderDirection) = $this->getListOrder($request->get('orden'));
 
         $posts = Post::query()
-            ->scopes($this->getListScopes($category, $routeName))
+            ->scopes($this->getListScopes($category, $request))
             ->orderBy($orderColumn, $orderDirection)
-            ->paginate();
-
-        $posts->appends(request()->intersect(['orden']));
-
-        $categoryItems = $this->getCategoryItems($routeName);
+            ->paginate()
+            ->appends($request->intersect(['orden']));
 
         return view('posts.index', compact('posts', 'category', 'categoryItems'));
     }
 
-    protected function getCategoryItems(string $routeName)
-    {
-        return Category::query()
-            ->orderBy('name')
-            ->get()
-            ->map(function ($category) use ($routeName) {
-                return [
-                    'title' => $category->name,
-                    'full_url' => route($routeName, $category)
-                ];
-            })
-            ->toArray();
-    }
 
-    protected function getListScopes(Category $category, string $routeName)
+    protected function getListScopes(Category $category, Request $request)
     {
         $scopes = [];
 
+        $routeName = $request->route()->getName();
+
         if ($category->exists) {
             $scopes['category'] = [$category];
+        }
+
+        if ($routeName == 'posts.mine') {
+            $scopes['byUser'] = [$request->user()];
         }
 
         if ($routeName == 'posts.pending') {
