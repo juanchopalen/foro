@@ -4,7 +4,7 @@ use Tests\TestsHelper;
 use Tests\CreatesApplication;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class FeatureTestCase extends TestCase
+class FeatureTestCase extends \Laravel\BrowserKitTesting\TestCase
 {
     use CreatesApplication, TestsHelper, DatabaseTransactions;
 
