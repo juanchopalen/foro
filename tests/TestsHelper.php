@@ -24,4 +24,11 @@ trait TestsHelper
     {
         return factory(\App\Post::class)->create($attributes);
     }	
+
+
+    protected function anyone(array $attributes = [])
+    {
+        return factory(User::class)->create($attributes);
+    }
+    
 }
