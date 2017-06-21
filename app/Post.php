@@ -8,7 +8,6 @@ use GrahamCampbell\Markdown\Facades\Markdown;
 
 class Post extends Model
 {
-    use CanBeVoted;
 
     protected $fillable = ['title', 'content', 'category_id'];
 

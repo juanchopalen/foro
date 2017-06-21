@@ -20,16 +20,22 @@
                 @endif
             </p>
 
+            <form>
+                <button class="btn btn-default">+1</button>
+                    Puntuación actual: <strong id="current-score">5</strong>
+                <button class="btn btn-default">-1</button>
+            </form>            
+
             {!! $post->safe_html_content !!}
 
             @if (auth()->check())
                 @if (!auth()->user()->isSubscribedTo($post))
                     {!! Form::open(['route' => ['posts.subscribe', $post], 'method' => 'POST']) !!}
-                    <button type="submit">Suscribirse al post</button>
+                    <button  class="btn btn-default" type="submit">Suscribirse al post</button>
                     {!! Form::close() !!}
                 @else
                     {!! Form::open(['route' => ['posts.unsubscribe', $post], 'method' => 'DELETE']) !!}
-                    <button type="submit">Desuscribirse del post</button>
+                    <button  class="btn btn-default" type="submit">Desuscribirse del post</button>
                     {!! Form::close() !!}
                 @endif
             @endif
