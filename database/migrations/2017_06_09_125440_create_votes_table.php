@@ -16,7 +16,14 @@ class CreateVotesTable extends Migration
         Schema::create('votes', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id')->referecnces('id')->on('users');
-            $table->unsignedInteger('post_id')->referecnces('id')->on('posts');
+            
+            //votable
+
+            $table->unsignedInteger('votable_id')->index();
+            $table->string('votable_type', 20) ->index();
+
+            $table->unique(['user_id', 'votable_id', 'votable_type']);
+
             $table->tinyInteger('vote');
             $table->timestamps();
         });
