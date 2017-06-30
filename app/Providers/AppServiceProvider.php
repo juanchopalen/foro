@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->registerViewComposers();
     }
 
     /**
@@ -32,11 +32,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Carbon::setLocale(config('app.locale'));
-
-        $this->registerViewComposers();
     }
 
-    public function registerViewComposers()
+    protected function registerViewComposers()
     {
         View::composer('posts.sidebar', PostSidebarComposer::class);
     }

@@ -1,6 +1,6 @@
 <?php
 
-use App\{Post, Category};
+use App\Post;
 
 class CreatePostsTest extends FeatureTestCase
 {

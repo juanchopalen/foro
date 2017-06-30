@@ -1,7 +1,8 @@
-<?php 
+<?php
+
 namespace Tests;
 
-use App\{User, Post};
+use App\{Post, User};
 
 trait TestsHelper
 {
@@ -9,7 +10,6 @@ trait TestsHelper
      * @var \App\User
      */
     protected $defaultUser;
-
 
     public function defaultUser(array $attributes = [])
     {
@@ -22,13 +22,18 @@ trait TestsHelper
 
     protected function createPost(array $attributes = [])
     {
-        return factory(\App\Post::class)->create($attributes);
-    }	
-
+        return factory(Post::class)->create($attributes);
+    }
 
     protected function anyone(array $attributes = [])
     {
         return factory(User::class)->create($attributes);
     }
-    
+
+    protected function actingAsAnyone(array $attributes = [])
+    {
+        $user = $this->anyone($attributes);
+        $this->actingAs($user);
+        return $user;
+    }
 }

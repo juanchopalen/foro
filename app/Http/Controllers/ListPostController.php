@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\{Post, Category};
 use Illuminate\Http\Request;
 
-
 class ListPostController extends Controller
 {
     public function __invoke(Category $category = null, Request $request)
-    {     
+    {
         list($orderColumn, $orderDirection) = $this->getListOrder($request->get('orden'));
 
         $posts = Post::query()
@@ -20,27 +19,23 @@ class ListPostController extends Controller
             ->paginate()
             ->appends($request->intersect(['orden']));
 
-        return view('posts.index', compact('posts', 'category', 'categoryItems'));
+        return view('posts.index', compact('posts', 'category'));
     }
-
 
     protected function getRouteScope(Request $request)
     {
         $scopes = [
             'posts.mine' => ['byUser' => [$request->user()]],
-            'posts.pending' =>['pending'],
-            'posts.completed' => ['completed'],
-
+            'posts.pending' => ['pending'],
+            'posts.completed' => ['completed']
         ];
 
         return $scopes[$request->route()->getName()] ?? [];
-
-        //return isset($scopes[$name]) ? $scopes[$name] :  [];
     }
 
     protected function getListOrder($order)
     {
-        $orders =[
+        $orders = [
             'recientes' => ['created_at', 'desc'],
             'antiguos' => ['created_at', 'asc'],
         ];

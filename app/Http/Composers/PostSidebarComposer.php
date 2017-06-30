@@ -1,30 +1,29 @@
-<?php 
+<?php
 
 namespace App\Http\Composers;
 
+use App\Category;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Route;
-use App\Category;
 
-class PostSidebarComposer 
+class PostSidebarComposer
 {
-	protected $listRoutes =  ['posts.index', 'posts.completed', 'posts.pending'];
-	
-	function compose(View $view)
-	{
-		$view->categoryItems = $this->getCategoryItems();
+    protected $listRoutes = ['posts.index', 'posts.completed', 'posts.pending'];
 
-		$view->filters = trans('menu.filters');
-	}
+    public function compose(View $view)
+    {
+        $view->categoryItems = $this->getCategoryItems();
 
+        $view->filters = trans('menu.filters');
+    }
 
     protected function getCategoryItems()
     {
-    	$routeName = Route::getCurrentRoute()->getName();
+        $routeName = Route::getCurrentRoute()->getName();
 
-    	if (!in_array($routeName, $this->listRoutes)) {
-    		$routeName = 'posts.index';
-    	}
+        if (!in_array($routeName, $this->listRoutes)) {
+            $routeName = 'posts.index';
+        }
 
         return Category::query()
             ->orderBy('name')
@@ -37,5 +36,4 @@ class PostSidebarComposer
             })
             ->toArray();
     }
-
 }

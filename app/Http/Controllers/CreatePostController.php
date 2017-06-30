@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\{Post, Category};
+use App\Category;
+use App\Post;
 use Illuminate\Http\Request;
 
 class CreatePostController extends Controller
@@ -10,6 +11,7 @@ class CreatePostController extends Controller
     public function create()
     {
         $categories = Category::pluck('name', 'id')->toArray();
+
         return view('posts.create', compact('categories'));
     }
 

@@ -138,12 +138,13 @@ return [
         'content'               => 'contenido',
         'body'                  => 'contenido',
         'description'           => 'descripción',
+        'comment'               => 'comentario',
         'excerpt'               => 'extracto',
         'date'                  => 'fecha',
         'time'                  => 'hora',
         'subject'               => 'asunto',
         'message'               => 'mensaje',
-        'category_id'               => 'categoria',
+        'category_id'           => 'categoría',
     ],
 
 ];

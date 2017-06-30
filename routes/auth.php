@@ -13,19 +13,18 @@ Route::post('posts/create', [
     'as' => 'posts.store',
 ]);
 
-//Votes
-Route::post('posts/{post}-{slug}/upvote', [
+// Votes
+Route::post('posts/{post}-{slug}/vote/1', [
     'uses' => 'VotePostController@upvote'
 ])->where('post', '\d+');
 
-Route::post('posts/{post}-{slug}/downvote', [
+Route::post('posts/{post}-{slug}/vote/-1', [
     'uses' => 'VotePostController@downvote'
 ])->where('post', '\d+');
 
 Route::delete('posts/{post}-{slug}/vote', [
     'uses' => 'VotePostController@undoVote'
 ])->where('post', '\d+');
-
 
 // Comments
 Route::post('posts/{post}/comment', [
@@ -53,4 +52,3 @@ Route::get('mis-posts/{category?}', [
     'uses' => 'ListPostController',
     'as' => 'posts.mine',
 ]);
-

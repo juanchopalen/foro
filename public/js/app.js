@@ -11281,8 +11281,6 @@ module.exports = g;
 
 __webpack_require__(33);
 
-window.Vue = __webpack_require__(40);
-
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -11290,6 +11288,7 @@ window.Vue = __webpack_require__(40);
  */
 
 Vue.component('example', __webpack_require__(36));
+
 Vue.component('app-vote', __webpack_require__(37));
 
 var app = new Vue({
@@ -12190,34 +12189,58 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-	props: ['score', 'vote'],
-	data: function data() {
-		return {
-			currentVote: this.vote ? parseInt(this.vote) : null,
-			currentScore: parseInt(this.score)
-		};
-	},
+    props: ['score', 'vote'],
+    data: function data() {
+        return {
+            currentVote: this.vote ? parseInt(this.vote) : null,
+            currentScore: parseInt(this.score),
+            voteInProgress: false
+        };
+    },
 
-	methods: {
-		addVote: function addVote(amount) {
-			if (this.currentVote == amount) {
-				this.currentScore -= this.currentVote;
+    methods: {
+        upvote: function upvote() {
+            this.addVote(1);
+        },
+        downvote: function downvote() {
+            this.addVote(-1);
+        },
+        addVote: function addVote(amount) {
+            this.voteInProgress = true;
 
-				axios.delete(window.location.href + '/vote');
+            if (this.currentVote == amount) {
+                this.processRequest('delete', 'vote');
 
-				this.currentVote = null;
-			} else {
+                this.currentVote = null;
+            } else {
+                this.processRequest('post', 'vote/' + amount);
 
-				this.currentScore += this.currentVote ? amount * 2 : amount;
+                this.currentVote = amount;
+            }
+        },
+        processRequest: function processRequest(method, action) {
+            var _this = this;
 
-				axios.post(window.location.href + (amount == 1 ? '/upvote' : '/downvote'));
+            axios[method](this.buildUrl(action)).then(function (response) {
+                _this.currentScore = response.data.new_score;
 
-				this.currentVote = amount;
-			}
-		}
-	}
+                _this.voteInProgress = false;
+            }).catch(function (thrown) {
+                alert('Ocurrió un error!');
+
+                _this.voteInProgress = false;
+            });
+        },
+        buildUrl: function buildUrl(action) {
+            return window.location.href + '/' + action;
+        }
+    }
 });
 
 /***/ }),
@@ -12233,11 +12256,17 @@ window._ = __webpack_require__(35);
  * code may be modified to fit the specific needs of your application.
  */
 
-try {
-  window.$ = window.jQuery = __webpack_require__(8);
+window.$ = window.jQuery = __webpack_require__(8);
 
-  __webpack_require__(34);
-} catch (e) {}
+__webpack_require__(34);
+
+/**
+ * Vue is a modern JavaScript library for building interactive web interfaces
+ * using reactive data binding and reusable components. Vue's API is clean
+ * and simple, leaving you to focus on building your next great project.
+ */
+
+window.Vue = __webpack_require__(40);
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -12247,21 +12276,10 @@ try {
 
 window.axios = __webpack_require__(13);
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-/**
- * Next we will register the CSRF Token as a common header with Axios so that
- * all outgoing HTTP requests automatically have it attached. This is just
- * a simple convenience so we don't have to attach every token manually.
- */
-
-var token = document.head.querySelector('meta[name="csrf-token"]');
-
-if (token) {
-  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
+window.axios.defaults.headers.common = {
+  'X-CSRF-TOKEN': window.Laravel.csrfToken,
+  'X-Requested-With': 'XMLHttpRequest'
+};
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -12269,9 +12287,7 @@ if (token) {
  * allows your team to easily build robust real-time web applications.
  */
 
-// import Echo from 'laravel-echo'
-
-// window.Pusher = require('pusher-js');
+// import Echo from "laravel-echo"
 
 // window.Echo = new Echo({
 //     broadcaster: 'pusher',
@@ -31827,13 +31843,16 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('form', [_c('button', {
+  return _c('div', [_c('form', [_c('button', {
     staticClass: "btn",
     class: _vm.currentVote == 1 ? 'btn-primary' : 'btn-default',
+    attrs: {
+      "disabled": _vm.voteInProgress
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.addVote(1)
+        _vm.upvote($event)
       }
     }
   }, [_vm._v("+1")]), _vm._v("\n        Puntuación actual: "), _c('strong', {
@@ -31843,13 +31862,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_vm._v(_vm._s(_vm.currentScore))]), _vm._v(" "), _c('button', {
     staticClass: "btn btn-default",
     class: _vm.currentVote == -1 ? 'btn-primary' : 'btn-default',
+    attrs: {
+      "disabled": _vm.voteInProgress
+    },
     on: {
       "click": function($event) {
         $event.preventDefault();
-        _vm.addVote(-1)
+        _vm.downvote($event)
       }
     }
-  }, [_vm._v("-1")])])
+  }, [_vm._v("-1")])])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

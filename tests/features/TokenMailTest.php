@@ -1,37 +1,35 @@
 <?php
 
-use App\Mail\TokenMail;
-use App\{Token, User};
+use App\{User, Token};
+use Illuminate\Support\Facades\Mail;
 use \Symfony\Component\DomCrawler\Crawler;
 
 class TokenMailTest extends FeatureTestCase
 {
     /**
-     * A basic test example.
-     *
-     * @test 
+     * @test
      */
-    public function it_sends_a_email_with_the_token()
+    function it_sends_a_link_with_the_token()
     {
+        $user = new User([
+            'first_name' => 'Duilio',
+            'last_name' => 'Palacios',
+            'email' => 'duilio@styde.net',
+        ]);
 
-    	$user = new User([
-    		'first_name' => 'Juan',
-    		'last_name' => 'Palencia',
-    		'email' => 'klaustro@hotmail.com'
-    	]);
-    	$token = new Token([
-    		'token' => 'this-is-a-token',
-    		'user' => $user
-    	]);
+        $token = new Token([
+            'token' => 'this-is-a-token',
+            'user' => $user,
+        ]);
 
-    	$this->open(new  TokenMail($token))
-    		->seeLink($token->url, $token->url);
-
+        $token_url = route('login', ['token' => $token->token]);
+        
+        $this->open(new \App\Mail\TokenMail($token))
+            ->seeLink($token_url, $token_url);
     }
-
+    
     protected function open(\Illuminate\Mail\Mailable $mailable)
     {
-
         $transport = Mail::getSwiftMailer()->getTransport();
 
         $transport->flush();
@@ -40,8 +38,8 @@ class TokenMailTest extends FeatureTestCase
 
         $message = $transport->messages()->first();
 
-        $this->crawler = new Crawler($message->getBody());    
+        $this->crawler = new Crawler($message->getBody());
 
-        return $this;	
+        return $this;
     }
 }

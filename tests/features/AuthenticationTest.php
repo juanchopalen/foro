@@ -33,20 +33,19 @@ class AuthenticationTest extends FeatureTestCase
 
         $token = Token::generateFor($user);
 
-        $InvalidToken = str_random(60);
+        $invalidToken = str_random(60);
 
         // When
-        $this->visit("login/{$InvalidToken}");
+        $this->visit("login/{$invalidToken}");
 
-        // Then
         $this->dontSeeIsAuthenticated()
             ->seeRouteIs('token')
-            ->see('Este enlace ya expiró, por favor solicite otro');
+            ->see('Este enlace ya expiró, por favor solicita otro');
 
-        $this->SeeInDatabase('tokens', [
+        $this->seeInDatabase('tokens', [
             'id' => $token->id
         ]);
-    }    
+    }
 
     function test_a_user_cannot_use_the_same_token_twice()
     {
@@ -60,15 +59,14 @@ class AuthenticationTest extends FeatureTestCase
         Auth::logout();
 
         // When
-        $this->visit("login/{$token->token}");
+        $this->visitRoute('login', ['token' => $token->token]);
 
-        // Then
         $this->dontSeeIsAuthenticated()
             ->seeRouteIs('token')
-            ->see('Este enlace ya expiró, por favor solicite otro');
-    }    
+            ->see('Este enlace ya expiró, por favor solicita otro');
+    }
 
-    function test_a_the_token_expires_after_30_minutes()
+    function test_the_token_expires_after_30_minutes()
     {
         // Having
         $user = $this->defaultUser();
@@ -78,13 +76,12 @@ class AuthenticationTest extends FeatureTestCase
         Carbon::setTestNow(Carbon::parse('+31 minutes'));
 
         // When
-        $this->visitRoute('login',[$token->token]);
+        $this->visitRoute('login', ['token' => $token->token]);
 
-        // Then
         $this->dontSeeIsAuthenticated()
             ->seeRouteIs('token')
-            ->see('Este enlace ya expiró, por favor solicite otro');
-    }    
+            ->see('Este enlace ya expiró, por favor solicita otro');
+    }
 
     function test_the_token_is_case_sensitive()
     {
@@ -94,11 +91,10 @@ class AuthenticationTest extends FeatureTestCase
         $token = Token::generateFor($user);
 
         // When
-        $this->visitRoute('login',[strtolower($token->token)]);
+        $this->visitRoute('login', ['token' => strtolower($token->token)]);
 
-        // Then
         $this->dontSeeIsAuthenticated()
             ->seeRouteIs('token')
-            ->see('Este enlace ya expiró, por favor solicite otro');
-    }   
+            ->see('Este enlace ya expiró, por favor solicita otro');
+    }
 }
