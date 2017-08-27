@@ -10,10 +10,17 @@ trait CanBeVoted
     {
         return $this->morphMany(Vote::class, 'votable');
     }
+
+    public function userVote()
+    {
+        return $this->morphOne(Vote::class, 'votable')
+            ->where('user_id', auth()->id())
+            ->withDefault();
+    }    
     public function getCurrentVoteAttribute()
     {
         if (auth()->check()) {
-            return $this->getVoteFrom(auth()->user());
+            return $this->userVote->vote;
         }
     }
 
@@ -21,7 +28,7 @@ trait CanBeVoted
     {
         return $this->votes()
             ->where('user_id', $user->id)
-            ->value('vote'); //+1, -1, null
+            ->value('vote');
     }
   /**
      * Renders the Vue vote component.

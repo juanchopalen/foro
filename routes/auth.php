@@ -19,6 +19,8 @@ Route::bind('votable', function($votableId, $route){
 
 });
 
+Route::post('logout', 'Auth\LoginController@logout');
+
 // Posts
 Route::get('posts/create', [
     'uses' => 'CreatePostController@create',

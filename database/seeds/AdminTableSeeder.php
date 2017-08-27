@@ -16,7 +16,7 @@ class AdminTableSeeder extends Seeder
             'last_name' => 'Palencia',
             'username' => 'klaustro',
             'email' => 'juanchopalen@gmail.com',      
-                        'role' => 'admin'  	
+            'role' => 'admin'  	
         ]);
     }
 }
